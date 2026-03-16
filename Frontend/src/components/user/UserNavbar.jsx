@@ -1,9 +1,15 @@
 import React, { useState } from "react";
-import { Link, Outlet } from "react-router-dom";
+import { Link, Outlet, useNavigate } from "react-router-dom";
+import { clearUser } from "../../utils/auth";
 
 export const UserNavbar = () => {
-
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
+
+  const handleLogout = () => {
+    clearUser();
+    navigate("/");
+  };
 
   return (
     <>
@@ -47,7 +53,10 @@ export const UserNavbar = () => {
               </Link>
             </li>
             <li>
-              <button className="bg-blue-500 text-white px-4 py-1 rounded-lg hover:bg-blue-600">
+              <button
+                className="bg-blue-500 text-white px-4 py-1 rounded-lg hover:bg-blue-600"
+                onClick={handleLogout}
+              >
                 Logout
               </button>
             </li>
@@ -78,7 +87,10 @@ export const UserNavbar = () => {
               <Link to="/user/settings">Settings</Link>
             </li>
             <li>
-              <button className="bg-blue-500 text-white px-4 py-1 rounded-lg w-fit">
+              <button
+                className="bg-blue-500 text-white px-4 py-1 rounded-lg w-fit"
+                onClick={handleLogout}
+              >
                 Logout
               </button>
             </li>

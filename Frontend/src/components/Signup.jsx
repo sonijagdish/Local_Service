@@ -1,7 +1,20 @@
-import React from "react";
+import axios from "axios";
+import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
+import { isAuthenticated, setUser } from "../utils/auth";
+import Local from "../assets/photo/Local.jpg";
+import "./Auth.css";
 
 export default function Signup() {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (isAuthenticated()) {
+      navigate("/user");
+    }
+  }, [navigate]);
 
   const {
     register,
@@ -12,28 +25,29 @@ export default function Signup() {
 
   const password = watch("password");
 
-  const onSubmit = (data) => {
-    console.log(data);
+  const onSubmit = async (data) => {
+    try {
+      const res = await axios.post("http://localhost:3000/user/register", data);
+      if (res.status === 201) {
+        setUser(res.data.data);
+        toast.success("Signup successful. Redirecting...");
+        navigate("/user");
+      }
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Signup failed");
+    }
   };
 
   return (
-    <div className="min-h-screen flex">
-
-      {/* LEFT SIDE IMAGE */}
-      <div className="hidden md:flex w-1/2 h-screen">
-        <img
-          src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d"
-          alt="office"
-          className="object-cover w-full h-full"
-        />
+    <div className="auth-layout">
+      <div className="auth-image">
+        <img src={Local} alt="office" />
       </div>
 
-      {/* RIGHT SIDE FORM */}
-      <div className="flex items-center justify-center w-full md:w-1/2 px-6">
-        <div className="w-full max-w-md">
-
-          <h2 className="text-3xl font-bold mb-2">Create Account 🚀</h2>
-          <p className="text-gray-500 mb-6">Signup to get started</p>
+      <div className="auth-panel">
+        <div className="auth-card">
+          <h2>Create Account 🚀</h2>
+          <p className="subtitle">Signup to get started</p>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
 
@@ -42,11 +56,11 @@ export default function Signup() {
               <input
                 type="text"
                 placeholder="Full Name"
-                className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+                className="auth-input"
                 {...register("name", { required: "Name is required" })}
               />
               {errors.name && (
-                <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>
+                <p className="auth-error">{errors.name.message}</p>
               )}
             </div>
 
@@ -55,11 +69,11 @@ export default function Signup() {
               <input
                 type="email"
                 placeholder="Email"
-                className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+                className="auth-input"
                 {...register("email", { required: "Email is required" })}
               />
               {errors.email && (
-                <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
+                <p className="auth-error">{errors.email.message}</p>
               )}
             </div>
 
@@ -68,7 +82,7 @@ export default function Signup() {
               <input
                 type="password"
                 placeholder="Password"
-                className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+                className="auth-input"
                 {...register("password", {
                   required: "Password is required",
                   minLength: {
@@ -78,7 +92,7 @@ export default function Signup() {
                 })}
               />
               {errors.password && (
-                <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>
+                <p className="auth-error">{errors.password.message}</p>
               )}
             </div>
 
@@ -87,7 +101,7 @@ export default function Signup() {
               <input
                 type="password"
                 placeholder="Confirm Password"
-                className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+                className="auth-input"
                 {...register("confirmPassword", {
                   required: "Confirm your password",
                   validate: (value) =>
@@ -95,21 +109,21 @@ export default function Signup() {
                 })}
               />
               {errors.confirmPassword && (
-                <p className="text-red-500 text-sm mt-1">
-                  {errors.confirmPassword.message}
-                </p>
+                <p className="auth-error">{errors.confirmPassword.message}</p>
               )}
             </div>
 
             {/* BUTTON */}
-            <button
-              type="submit"
-              className="w-full bg-blue-500 text-white p-3 rounded-lg hover:bg-blue-600 transition"
-            >
+            <button type="submit" className="auth-button">
               Signup
             </button>
 
           </form>
+
+          <p className="text-center text-gray-200 mt-6">
+            Already have an account?{' '}
+            <span className="auth-link" onClick={() => navigate('/')}>Login</span>
+          </p>
 
         </div>
       </div>

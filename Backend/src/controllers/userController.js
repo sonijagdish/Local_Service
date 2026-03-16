@@ -1,25 +1,41 @@
-const userSchema = require('../models/userModel');
+const User = require("../models/userModel");
 
-const register = async (req, res) => {
-    try {
-        const isExistingUser = await userSchema.findOne({ email: req.body.email });
-        
-        if (isExistingUser) {
-            return res.status(400).json({ message: 'Email already exists, please login' });
-        }
+// CREATE
+const createUser = async (req, res) => {
+  const user = await User.create(req.body);
+  res.json(user);
+};
 
-        const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(req.body.password, salt);
-        req.body.password = hashedPassword;
+// READ ALL
+const getAllUsers = async (req, res) => {
+  const users = await User.find();
+  res.json(users);
+};
 
-        const newUser = await userSchema.create( req.body );
-        
-        res.status(201).json({ message: 'User created successfully', data: newUser });
-    } catch (error) {
-        res.status(500).json({ message: 'Error creating user', error: error.message });
-    }
+// READ ONE
+const getUserById = async (req, res) => {
+  const user = await User.findById(req.params.id);
+  res.json(user);
+};
+
+// UPDATE
+const updateUser = async (req, res) => {
+  const user = await User.findByIdAndUpdate(req.params.id, req.body, {
+    new: true,
+  });
+  res.json(user);
+};
+
+// DELETE
+const deleteUser = async (req, res) => {
+  await User.findByIdAndDelete(req.params.id);
+  res.json({ message: "User deleted" });
 };
 
 module.exports = {
-    register
+  createUser,
+  getAllUsers,
+  getUserById,
+  updateUser,
+  deleteUser
 };
